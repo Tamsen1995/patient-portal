@@ -3,24 +3,28 @@ import React, { useEffect, useState } from "react";
 interface Patient {
   id: number;
   name: string;
-  first_name: string;
-  age: number;
-  height: number;
-  weight: number;
-  gender: string;
 }
 
 const PatientList: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("http://localhost:3001/patients")
       .then((response) => response.json())
-      .then((data) => setPatients(data))
+      .then((data) => {
+        setPatients(data);
+        setLoading(false);
+      })
       .catch((error) => {
         console.error("Error:", error);
+        setLoading(false);
       });
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Replace this with loading spinner
+  }
 
   return (
     <div className="flex flex-col">
@@ -36,36 +40,6 @@ const PatientList: React.FC = () => {
                   >
                     Name
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    First Name
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Age
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Height
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Weight
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Gender
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -74,29 +48,6 @@ const PatientList: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
                         {patient.name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {patient.first_name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{patient.age}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {patient.height}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {patient.weight}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {patient.gender}
                       </div>
                     </td>
                   </tr>
