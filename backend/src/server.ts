@@ -1,15 +1,17 @@
 import express, { Request, Response } from "express";
 import { Sequelize, DataTypes, Model } from "sequelize";
 import cors from "cors";
+import fs from "fs";
+import path from "path";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Initialize Sequelize
-const sequelize = new Sequelize("database", "username", "password", {
-  host: "localhost",
-  dialect: "postgres",
+// Initialize Sequelize with SQLite
+const sequelize = new Sequelize({
+  dialect: "sqlite",
+  storage: "./database.sqlite",
 });
 
 // Define a "Medication" model
@@ -90,6 +92,11 @@ const Patient = sequelize.define<PatientInstance>("Patient", {
 Patient.hasMany(Medication);
 Patient.hasMany(BodyTemperature);
 
+// Read the JSON file
+const data = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, "../patient_data.json"), "utf-8")
+);
+
 // Define routes
 app.get("/patients", async (req: Request, res: Response) => {
   const patients = await Patient.findAll({
@@ -106,7 +113,14 @@ app.post("/patients", async (req: Request, res: Response) => {
 });
 
 // Sync database and start server
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync({ force: true }).then(async () => {
+  // Populate the database
+  for (const patient of data) {
+    await Patient.create(patient, {
+      include: [Medication, BodyTemperature],
+    });
+  }
+
   app.listen(3001, () => {
     console.log("Server is running on port 3001");
   });
