@@ -1,19 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-type Patient = {
+interface Patient {
   id: number;
   name: string;
+  first_name: string;
   age: number;
-  condition: string;
-};
-
-const patients: Patient[] = [
-  { id: 1, name: "John Doe", age: 30, condition: "Healthy" },
-  { id: 2, name: "Jane Doe", age: 25, condition: "Healthy" },
-  { id: 3, name: "Jim Doe", age: 35, condition: "Healthy" },
-];
+  height: number;
+  weight: number;
+  gender: string;
+}
 
 const PatientList: React.FC = () => {
+  const [patients, setPatients] = useState<Patient[]>([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/patients")
+      .then((response) => response.json())
+      .then((data) => setPatients(data))
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, []);
+
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -32,13 +40,31 @@ const PatientList: React.FC = () => {
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    First Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Age
                   </th>
                   <th
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Condition
+                    Height
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Weight
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Gender
                   </th>
                 </tr>
               </thead>
@@ -51,11 +77,26 @@ const PatientList: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {patient.first_name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">{patient.age}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
-                        {patient.condition}
+                        {patient.height}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {patient.weight}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {patient.gender}
                       </div>
                     </td>
                   </tr>

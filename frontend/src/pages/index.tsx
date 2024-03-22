@@ -8,7 +8,7 @@ const Home: React.FC = () => {
         <h1 className="text-2xl font-bold">Welcome to our Patient Portal!</h1>
 
         <div className="mt-4">
-          <Link href="/patient-list">
+          <Link href="/patients">
             <button className="inline-block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-blue-700 rounded shadow ripple hover:shadow-lg hover:bg-blue-800 focus:outline-none">
               View The Patient List
             </button>
