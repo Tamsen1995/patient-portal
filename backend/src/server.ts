@@ -76,7 +76,15 @@ const data = JSON.parse(
 );
 
 // Initialize progress bar
-const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+const bar = new cliProgress.SingleBar(
+  {
+    format:
+      "Populating the database: |" +
+      "{bar}" +
+      "| {percentage}% || {value}/{total} Patients",
+  },
+  cliProgress.Presets.shades_classic
+);
 bar.start(data.length, 0);
 
 // Define routes
@@ -110,7 +118,6 @@ app.post("/patients", async (req: Request, res: Response) => {
 // Sync database and start server
 sequelize.sync({ force: true }).then(async () => {
   // Populate the database
-  console.log("Populating the database...");
   for (const patient of data) {
     bar.increment();
     const { medications, body_temperatures, ...patientData } = patient;
