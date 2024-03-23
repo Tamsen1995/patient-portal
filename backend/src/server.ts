@@ -70,9 +70,13 @@ const Patient = sequelize.define<PatientInstance>("Patient", {
 Patient.hasMany(Medication);
 Patient.hasMany(BodyTemperature);
 
-// Read the JSON file
+// // Read the JSON file
+// const data = JSON.parse(
+//   fs.readFileSync(path.resolve(__dirname, "../sample.json"), "utf-8")
+// );
+
 const data = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, "../sample.json"), "utf-8")
+  fs.readFileSync(path.resolve(__dirname, "../patient_data.json"), "utf-8")
 );
 
 // Initialize progress bar
@@ -89,10 +93,7 @@ const bar = new cliProgress.SingleBar(
 // Define routes
 app.get("/patients", async (req: Request, res: Response) => {
   console.log("GET /patients");
-  const patients = await Patient.findAll({
-    include: [Medication, BodyTemperature],
-  });
-
+  const patients = await Patient.findAll();
   res.json(patients);
 });
 
