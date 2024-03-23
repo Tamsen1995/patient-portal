@@ -39,6 +39,7 @@ const PatientProfile = () => {
 
   const [patient, setPatient] = useState<Patient | null>(null);
 
+  const [scale, setScale] = useState(6);
   useEffect(() => {
     if (id) {
       fetch(`http://localhost:3001/patients/${id}`)
@@ -56,9 +57,29 @@ const PatientProfile = () => {
 
   // Prepare data for the chart
   const temperatureData = patient.BodyTemperatures.map((record) => ({
-    date: new Date(record.date).toLocaleDateString(),
+    date: new Date(record.date),
     temperature: record.temperature,
   }));
+
+  // Filter data based on the scale
+  // Get the latest date from the temperatureData array
+  const latestDate = new Date(
+    Math.max.apply(
+      null,
+      temperatureData.map((record) => new Date(record.date).getTime())
+    )
+  );
+
+  const filteredData = temperatureData.filter((record) => {
+    const pastDate = new Date(latestDate.getTime());
+    pastDate.setMonth(pastDate.getMonth() - scale);
+
+    // Convert dates to YYYY-MM-DD format for comparison
+    const recordDateStr = record.date.toISOString().split("T")[0];
+    const pastDateStr = pastDate.toISOString().split("T")[0];
+
+    return recordDateStr >= pastDateStr;
+  });
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen text-gray-500">
@@ -98,8 +119,18 @@ const PatientProfile = () => {
         </ul>
         <hr className="mb-4" />
         <h2 className="text-lg mb-4">Body Temperatures</h2>
+        <div className="mb-4">
+          <select
+            value={scale}
+            onChange={(e) => setScale(Number(e.target.value))}
+          >
+            <option value={1}>1 Month</option>
+            <option value={3}>3 Months</option>
+            <option value={6}>6 Months</option>
+          </select>
+        </div>
         <div className="mb-8">
-          <LineChart width={500} height={300} data={temperatureData}>
+          <LineChart width={500} height={300} data={filteredData}>
             <Line type="monotone" dataKey="temperature" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="date" />
