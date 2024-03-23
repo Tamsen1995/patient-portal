@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Patient {
   id: number;
@@ -47,7 +48,9 @@ const PatientList: React.FC = () => {
                   <tr key={patient.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {patient.name}
+                        <Link href={`/patient/${patient.id}`}>
+                          {patient.name}
+                        </Link>
                       </div>
                     </td>
                   </tr>

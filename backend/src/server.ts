@@ -12,12 +12,15 @@ app.use(express.json());
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./database.sqlite",
+  logging: false, // Add this line
 });
 
 // Define a "Medication" model
 interface MedicationInstance extends Model {
   name: string;
   dosage: string;
+  start_date: string;
+  end_date: string;
 }
 
 const Medication = sequelize.define<MedicationInstance>("Medication", {
@@ -28,6 +31,14 @@ const Medication = sequelize.define<MedicationInstance>("Medication", {
   dosage: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  start_date: {
+    type: DataTypes.DATE,
+    allowNull: true, // Make this field optional
+  },
+  end_date: {
+    type: DataTypes.DATE,
+    allowNull: true, // Make this field optional
   },
 });
 
@@ -53,6 +64,7 @@ const BodyTemperature = sequelize.define<BodyTemperatureInstance>(
 
 // Define a "Patient" model
 interface PatientInstance extends Model {
+  id: any;
   name: string;
   first_name: string;
   age: number;
@@ -105,6 +117,22 @@ app.get("/patients", async (req: Request, res: Response) => {
   res.json(patients);
 });
 
+// Define routes
+app.get("/patients/:id", async (req: Request, res: Response) => {
+  const patient = await Patient.findOne({
+    where: { id: req.params.id },
+    include: [Medication, BodyTemperature],
+  });
+
+  if (!patient) {
+    console.log(":::HEREdsadasdsad::::");
+
+    return res.status(404).json({ error: "Patient not found" });
+  }
+
+  res.json(patient);
+});
+
 app.post("/patients", async (req: Request, res: Response) => {
   const patient = await Patient.create(req.body, {
     include: [Medication, BodyTemperature],
@@ -115,10 +143,25 @@ app.post("/patients", async (req: Request, res: Response) => {
 // Sync database and start server
 sequelize.sync({ force: true }).then(async () => {
   // Populate the database
+  console.log("Populating the database");
   for (const patient of data) {
-    await Patient.create(patient, {
-      include: [Medication, BodyTemperature],
-    });
+    console.log("Creating patient:", patient.name);
+    const { medications, body_temperatures, ...patientData } = patient;
+
+    const newPatient = await Patient.create(patientData);
+
+    for (const medication of medications) {
+      console.log("Creating medication:", medication.name);
+      await Medication.create({ ...medication, PatientId: newPatient.id });
+    }
+
+    for (const bodyTemperature of body_temperatures) {
+      console.log("Creating body temperature:", bodyTemperature.temperature);
+      await BodyTemperature.create({
+        ...bodyTemperature,
+        PatientId: newPatient.id,
+      });
+    }
   }
 
   app.listen(3001, () => {
