@@ -1,5 +1,13 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
 
 interface Medication {
   id: number;
@@ -41,32 +49,65 @@ const PatientProfile = () => {
         .catch((error) => console.error("Error:", error));
     }
   }, [id]);
+
   if (!patient) {
     return <div>Loading...</div>;
   }
 
+  // Prepare data for the chart
+  const temperatureData = patient.BodyTemperatures.map((record) => ({
+    date: new Date(record.date).toLocaleDateString(),
+    temperature: record.temperature,
+  }));
+
   return (
-    <div>
-      <h1>{patient.name}</h1>
-      <p>First Name: {patient.first_name}</p>
-      <p>Age: {patient.age}</p>
-      <p>Height: {patient.height}</p>
-      <p>Weight: {patient.weight}</p>
-      <p>Gender: {patient.gender}</p>
-      <h2>Medications</h2>
-      {patient.Medications.map((medication) => (
-        <div key={medication.id}>
-          <p>Name: {medication.name}</p>
-          <p>Dosage: {medication.dosage}</p>
+    <div className="p-6 bg-gray-100 min-h-screen text-gray-500">
+      <div className="max-w-2xl w-full p-8 bg-white shadow-md rounded-md">
+        <h1 className="text-2xl mb-4">{patient.name}</h1>
+        <hr className="mb-4" />
+        <div className="grid grid-cols-2 gap-10 mb-4">
+          <div>
+            <h2 className="font-bold">First Name</h2>
+            <p>{patient.first_name}</p>
+          </div>
+          <div>
+            <h2 className="font-bold">Age</h2>
+            <p>{patient.age}</p>
+          </div>
+          <div>
+            <h2 className="font-bold">Height</h2>
+            <p>{patient.height}</p>
+          </div>
+          <div>
+            <h2 className="font-bold">Weight</h2>
+            <p>{patient.weight}</p>
+          </div>
+          <div>
+            <h2 className="font-bold">Gender</h2>
+            <p>{patient.gender}</p>
+          </div>
         </div>
-      ))}
-      <h2>Body Temperatures</h2>
-      {patient.BodyTemperatures.map((bodyTemperature) => (
-        <div key={bodyTemperature.id}>
-          <p>Date: {new Date(bodyTemperature.date).toLocaleDateString()}</p>
-          <p>Temperature: {bodyTemperature.temperature}</p>
+        <hr className="mb-4" />
+        <h2 className="text-lg mb-4">Medications</h2>
+        <ul className="list-disc list-inside mb-4">
+          {patient.Medications.map((medication) => (
+            <li key={medication.id}>
+              {medication.name} - {medication.dosage}
+            </li>
+          ))}
+        </ul>
+        <hr className="mb-4" />
+        <h2 className="text-lg mb-4">Body Temperatures</h2>
+        <div className="mb-8">
+          <LineChart width={500} height={300} data={temperatureData}>
+            <Line type="monotone" dataKey="temperature" stroke="#8884d8" />
+            <CartesianGrid stroke="#ccc" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+          </LineChart>
         </div>
-      ))}
+      </div>
     </div>
   );
 };
