@@ -13,6 +13,8 @@ interface Medication {
   id: number;
   name: string;
   dosage: string;
+  start_date: Date;
+  end_date: Date;
 }
 
 interface BodyTemperature {
@@ -114,6 +116,14 @@ const PatientProfile = () => {
           {patient.Medications.map((medication) => (
             <li key={medication.id}>
               {medication.name} - {medication.dosage}
+              {medication.start_date &&
+                ` (Start Date: ${new Date(
+                  medication.start_date
+                ).toLocaleDateString()})`}
+              {medication.end_date &&
+                ` (End Date: ${new Date(
+                  medication.end_date
+                ).toLocaleDateString()})`}
             </li>
           ))}
         </ul>
