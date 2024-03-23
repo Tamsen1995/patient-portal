@@ -1,0 +1,43 @@
+[
+  {
+    "name": "Doe",
+    "first_name": "John",
+    "age": 35,
+    "height": 175,
+    "weight": 75,
+    "gender": "Male",
+    "medications": [
+      {"name": "Aspirin", "dosage": "100mg", "start_date": "2023-01-01", "end_date": "2023-01-15"},
+      {"name": "Ibuprofen", "dosage": "200mg", "start_date": "2023-01-05", "end_date": "2023-01-20"},
+      {"name": "Paracetamol", "dosage": "500mg", "start_date": "2023-01-10", "end_date": "2023-01-25"}
+    ],
+    "body_temperatures": [
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5},
+      {"date": "2023-01-01", "temperature": 98.5}
+    ]
+  },
+  {
+    "name": "Smith",
+    "first_name": "Jane",
+    "age": 28,
+    "height": 160,
+    "weight": 60,
+    "gender": "Female",
+    "medications": [
+      {"name": "Amoxicillin", "dosage": "250mg", "start_date": "2023-01-03", "end_date": "2023-01-18"},
+      {"name": "Ciprofloxacin", "dosage": "500mg"},
+      {"name": "Levothyroxine", "dosage": "50mcg", "start_date": "2023-01-15", "end_date": "2023-01-30"}
+    ],
+    "body_temperatures": [
+    ]
+  }
+]

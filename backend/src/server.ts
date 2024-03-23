@@ -72,7 +72,7 @@ Patient.hasMany(BodyTemperature);
 
 // Read the JSON file
 const data = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, "../patient_data.json"), "utf-8")
+  fs.readFileSync(path.resolve(__dirname, "../sample.json"), "utf-8")
 );
 
 // Initialize progress bar
@@ -85,13 +85,14 @@ const bar = new cliProgress.SingleBar(
   },
   cliProgress.Presets.shades_classic
 );
-bar.start(data.length, 0);
 
 // Define routes
 app.get("/patients", async (req: Request, res: Response) => {
+  console.log("GET /patients");
   const patients = await Patient.findAll({
     include: [Medication, BodyTemperature],
   });
+
   res.json(patients);
 });
 
@@ -116,32 +117,40 @@ app.post("/patients", async (req: Request, res: Response) => {
 });
 
 // Sync database and start server
-sequelize.sync({ force: true }).then(async () => {
-  // Populate the database
-  for (const patient of data) {
-    bar.increment();
-    const { medications, body_temperatures, ...patientData } = patient;
+sequelize.sync().then(async () => {
+  // Check if any patients exist
+  const patientCount = await Patient.count();
 
-    const newPatient = await Patient.create(patientData);
+  if (patientCount === 0) {
+    // No patients exist, so populate the database
+    console.log("Populating the database...");
+    bar.start(data.length, 0);
 
-    // Use bulkCreate to insert all medications and body temperatures at once
-    const medicationsWithPatientId = medications.map(
-      (medication: MedicationInstance) => ({
-        ...medication,
-        PatientId: newPatient.id,
-      })
-    );
-    await Medication.bulkCreate(medicationsWithPatientId);
+    for (const patient of data) {
+      bar.increment();
+      const { medications, body_temperatures, ...patientData } = patient;
 
-    const bodyTemperaturesWithPatientId = body_temperatures.map(
-      (bodyTemperature: BodyTemperatureInstance) => ({
-        ...bodyTemperature,
-        PatientId: newPatient.id,
-      })
-    );
-    await BodyTemperature.bulkCreate(bodyTemperaturesWithPatientId);
+      const newPatient = await Patient.create(patientData);
+
+      // Use bulkCreate to insert all medications and body temperatures at once
+      const medicationsWithPatientId = medications.map(
+        (medication: MedicationInstance) => ({
+          ...medication,
+          PatientId: newPatient.id,
+        })
+      );
+      await Medication.bulkCreate(medicationsWithPatientId);
+
+      const bodyTemperaturesWithPatientId = body_temperatures.map(
+        (bodyTemperature: BodyTemperatureInstance) => ({
+          ...bodyTemperature,
+          PatientId: newPatient.id,
+        })
+      );
+      await BodyTemperature.bulkCreate(bodyTemperaturesWithPatientId);
+    }
+    bar.stop();
   }
-  bar.stop();
 
   // Start the server
   app.listen(3001, () => {
