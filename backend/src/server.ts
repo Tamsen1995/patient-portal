@@ -3,7 +3,9 @@ import { Sequelize, DataTypes, Model } from "sequelize";
 import cors from "cors";
 import fs from "fs";
 import path from "path";
+import * as cliProgress from "cli-progress";
 
+// Initialize Express and middleware
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -12,23 +14,22 @@ app.use(express.json());
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./database.sqlite",
+  logging: false,
 });
 
 // Define a "Medication" model
 interface MedicationInstance extends Model {
   name: string;
   dosage: string;
+  start_date: string;
+  end_date: string;
 }
 
 const Medication = sequelize.define<MedicationInstance>("Medication", {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  dosage: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+  name: { type: DataTypes.STRING, allowNull: false },
+  dosage: { type: DataTypes.STRING, allowNull: false },
+  start_date: { type: DataTypes.DATE, allowNull: true },
+  end_date: { type: DataTypes.DATE, allowNull: true },
 });
 
 // Define a "BodyTemperature" model
@@ -40,19 +41,14 @@ interface BodyTemperatureInstance extends Model {
 const BodyTemperature = sequelize.define<BodyTemperatureInstance>(
   "BodyTemperature",
   {
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    temperature: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
+    date: { type: DataTypes.DATE, allowNull: false },
+    temperature: { type: DataTypes.FLOAT, allowNull: false },
   }
 );
 
 // Define a "Patient" model
 interface PatientInstance extends Model {
+  id: any;
   name: string;
   first_name: string;
   age: number;
@@ -62,30 +58,12 @@ interface PatientInstance extends Model {
 }
 
 const Patient = sequelize.define<PatientInstance>("Patient", {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  first_name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  age: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  height: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  weight: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  gender: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+  name: { type: DataTypes.STRING, allowNull: false },
+  first_name: { type: DataTypes.STRING, allowNull: false },
+  age: { type: DataTypes.INTEGER, allowNull: false },
+  height: { type: DataTypes.FLOAT, allowNull: false },
+  weight: { type: DataTypes.FLOAT, allowNull: false },
+  gender: { type: DataTypes.STRING, allowNull: false },
 });
 
 // Define relationships
@@ -94,15 +72,41 @@ Patient.hasMany(BodyTemperature);
 
 // Read the JSON file
 const data = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, "../patient_data.json"), "utf-8")
+  fs.readFileSync(path.resolve(__dirname, "../sample.json"), "utf-8")
+);
+
+// Initialize progress bar
+const bar = new cliProgress.SingleBar(
+  {
+    format:
+      "Populating the database: |" +
+      "{bar}" +
+      "| {percentage}% || {value}/{total} Patients",
+  },
+  cliProgress.Presets.shades_classic
 );
 
 // Define routes
 app.get("/patients", async (req: Request, res: Response) => {
+  console.log("GET /patients");
   const patients = await Patient.findAll({
     include: [Medication, BodyTemperature],
   });
+
   res.json(patients);
+});
+
+app.get("/patients/:id", async (req: Request, res: Response) => {
+  const patient = await Patient.findOne({
+    where: { id: req.params.id },
+    include: [Medication, BodyTemperature],
+  });
+
+  if (!patient) {
+    return res.status(404).json({ error: "Patient not found" });
+  }
+
+  res.json(patient);
 });
 
 app.post("/patients", async (req: Request, res: Response) => {
@@ -113,14 +117,42 @@ app.post("/patients", async (req: Request, res: Response) => {
 });
 
 // Sync database and start server
-sequelize.sync({ force: true }).then(async () => {
-  // Populate the database
-  for (const patient of data) {
-    await Patient.create(patient, {
-      include: [Medication, BodyTemperature],
-    });
+sequelize.sync().then(async () => {
+  // Check if any patients exist
+  const patientCount = await Patient.count();
+
+  if (patientCount === 0) {
+    // No patients exist, so populate the database
+    console.log("Populating the database...");
+    bar.start(data.length, 0);
+
+    for (const patient of data) {
+      bar.increment();
+      const { medications, body_temperatures, ...patientData } = patient;
+
+      const newPatient = await Patient.create(patientData);
+
+      // Use bulkCreate to insert all medications and body temperatures at once
+      const medicationsWithPatientId = medications.map(
+        (medication: MedicationInstance) => ({
+          ...medication,
+          PatientId: newPatient.id,
+        })
+      );
+      await Medication.bulkCreate(medicationsWithPatientId);
+
+      const bodyTemperaturesWithPatientId = body_temperatures.map(
+        (bodyTemperature: BodyTemperatureInstance) => ({
+          ...bodyTemperature,
+          PatientId: newPatient.id,
+        })
+      );
+      await BodyTemperature.bulkCreate(bodyTemperaturesWithPatientId);
+    }
+    bar.stop();
   }
 
+  // Start the server
   app.listen(3001, () => {
     console.log("Server is running on port 3001");
   });
