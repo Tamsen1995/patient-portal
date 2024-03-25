@@ -1,4 +1,5 @@
 import TemperatureChart from "@/components/TemperatureChart";
+import TemperatureForm from "@/components/TemperatureForm";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
@@ -25,7 +26,7 @@ interface BodyTemperature {
 }
 
 interface Patient {
-  id: number;
+  id: string;
   name: string;
   first_name: string;
   age: number;
@@ -122,39 +123,7 @@ const PatientProfile = () => {
         </div>
         <hr className="mb-4" />
         <h2 className="text-lg mb-4">Body Temperatures</h2>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-gray-200 p-4 rounded-md my-4"
-        >
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Date:
-            </label>
-            <input
-              type="date"
-              value={temperatureDate}
-              onChange={(e) => setTemperatureDate(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Temperature:
-            </label>
-            <input
-              type="number"
-              value={temperatureValue}
-              onChange={(e) => setTemperatureValue(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Add/Update Temperature
-          </button>
-        </form>
+        <TemperatureForm patientId={patient.id} />
         <div className="mb-4">
           <select
             value={scale}
