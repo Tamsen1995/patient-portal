@@ -5,17 +5,48 @@ interface MedicationFormProps {
 }
 
 const MedicationForm: React.FC<MedicationFormProps> = ({ patientId }) => {
+  // State for form fields
   const [name, setName] = useState("");
   const [dosage, setDosage] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Send a POST or PUT request to the server to add or update the medication
+    try {
+      const response = await fetch(
+        `http://localhost:3001/patients/${patientId}/medications`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            dosage,
+            start_date: startDate,
+            end_date: endDate,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Clear form fields after successful submission
+      setName("");
+      setDosage("");
+      setStartDate("");
+      setEndDate("");
+    } catch (error) {
+      console.error("Error adding medication:", error);
+    }
   };
 
+  // Render form
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <input
