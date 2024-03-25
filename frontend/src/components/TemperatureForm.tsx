@@ -10,8 +10,6 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({ patientId }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("patientId", patientId);
-
     // Handle form submission here
     // For example, you might make a POST request to your API
     const response = await fetch(

@@ -46,7 +46,6 @@ router.post(
         date,
         PatientId: id,
       });
-      console.log("newTemperature : ", newTemperature);
       res.json(newTemperature);
     } catch (error) {
       res
