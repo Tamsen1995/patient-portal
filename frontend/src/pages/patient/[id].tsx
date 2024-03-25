@@ -4,14 +4,6 @@ import TemperatureForm from "@/components/TemperatureForm";
 
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
 
 interface Medication {
   id: number;
@@ -127,7 +119,26 @@ const PatientProfile = () => {
         <TemperatureChart data={filteredData} />
         <hr className="mb-4" />
         <h2 className="text-lg mb-4">Medications</h2>
-        <MedicationForm patientId={patient.id} />
+        <div className="space-y-2">
+          {patient.Medications.map((medication) => (
+            <div
+              key={medication.id}
+              className="p-4 border border-gray-300 rounded-md"
+            >
+              <h3 className="font-bold text-lg">{medication.name}</h3>
+              <p>Dosage: {medication.dosage}</p>
+              <p>
+                Start Date:{" "}
+                {new Date(medication.start_date).toLocaleDateString()}
+              </p>
+              <p>
+                End Date: {new Date(medication.end_date).toLocaleDateString()}
+              </p>
+            </div>
+          ))}
+          <h2 className="text-lg mb-4">Add Medication</h2>
+          <MedicationForm patientId={patient.id} />
+        </div>
       </div>
     </div>
   );
