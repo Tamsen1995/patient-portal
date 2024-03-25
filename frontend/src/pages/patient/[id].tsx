@@ -40,6 +40,8 @@ const PatientProfile = () => {
   const { id } = router.query;
 
   const [patient, setPatient] = useState<Patient | null>(null);
+  const [temperatureDate, setTemperatureDate] = useState("");
+  const [temperatureValue, setTemperatureValue] = useState("");
 
   const [scale, setScale] = useState(6);
   useEffect(() => {
@@ -53,6 +55,15 @@ const PatientProfile = () => {
     }
   }, [id]);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    console.log("date", temperatureDate);
+    // Add validation here to ensure that a temperature record can only be added once per day
+
+    // Send a POST or PUT request to the server to add or update the temperature record
+  };
+
   if (!patient) {
     return <div>Loading...</div>;
   }
@@ -64,7 +75,6 @@ const PatientProfile = () => {
   }));
 
   // Filter data based on the scale
-  // Get the latest date from the temperatureData array
   const latestDate = new Date(
     Math.max.apply(
       null,
@@ -76,7 +86,6 @@ const PatientProfile = () => {
     const pastDate = new Date(latestDate.getTime());
     pastDate.setMonth(pastDate.getMonth() - scale);
 
-    // Convert dates to YYYY-MM-DD format for comparison
     const recordDateStr = record.date.toISOString().split("T")[0];
     const pastDateStr = pastDate.toISOString().split("T")[0];
 
@@ -111,24 +120,40 @@ const PatientProfile = () => {
           </div>
         </div>
         <hr className="mb-4" />
-        <h2 className="text-lg mb-4">Medications</h2>
-        <ul className="list-disc list-inside mb-4">
-          {patient.Medications.map((medication) => (
-            <li key={medication.id}>
-              {medication.name} - {medication.dosage}
-              {medication.start_date &&
-                ` (Start Date: ${new Date(
-                  medication.start_date
-                ).toLocaleDateString()})`}
-              {medication.end_date &&
-                ` (End Date: ${new Date(
-                  medication.end_date
-                ).toLocaleDateString()})`}
-            </li>
-          ))}
-        </ul>
-        <hr className="mb-4" />
         <h2 className="text-lg mb-4">Body Temperatures</h2>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-gray-200 p-4 rounded-md my-4"
+        >
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Date:
+            </label>
+            <input
+              type="date"
+              value={temperatureDate}
+              onChange={(e) => setTemperatureDate(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Temperature:
+            </label>
+            <input
+              type="number"
+              value={temperatureValue}
+              onChange={(e) => setTemperatureValue(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Add/Update Temperature
+          </button>
+        </form>
         <div className="mb-4">
           <select
             value={scale}
