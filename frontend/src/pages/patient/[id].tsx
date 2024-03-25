@@ -1,11 +1,12 @@
 import MedicationForm from "@/components/MedicationForm";
 import TemperatureChart from "@/components/TemperatureChart";
 import TemperatureForm from "@/components/TemperatureForm";
+import Modal from "react-modal";
 
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-interface Medication {
+export interface Medication {
   id: number;
   name: string;
   dosage: string;
@@ -37,6 +38,9 @@ const PatientProfile = () => {
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [scale, setScale] = useState(6);
+  const [selectedMedication, setSelectedMedication] =
+    useState<Medication | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -125,6 +129,10 @@ const PatientProfile = () => {
             <div
               key={medication.id}
               className="p-4 border border-gray-300 rounded-md"
+              onClick={() => {
+                setSelectedMedication(medication);
+                setIsModalOpen(true);
+              }}
             >
               <h3 className="font-bold text-lg">{medication.name}</h3>
               <p>Dosage: {medication.dosage}</p>
@@ -137,8 +145,16 @@ const PatientProfile = () => {
               </p>
             </div>
           ))}
-          <h2 className="text-lg mb-4">Add Medication</h2>
-          <MedicationForm patientId={patient.id} className="" />
+          <button onClick={() => setIsModalOpen(true)}>Add Medication</button>
+          {isModalOpen && (
+            <Modal isOpen={isModalOpen}>
+              <MedicationForm
+                patientId={patient.id}
+                medication={selectedMedication}
+                className=""
+              />
+            </Modal>
+          )}
         </div>
       </div>
     </div>
