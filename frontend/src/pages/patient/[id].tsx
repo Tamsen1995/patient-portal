@@ -42,8 +42,6 @@ const PatientProfile = () => {
   const { id } = router.query;
 
   const [patient, setPatient] = useState<Patient | null>(null);
-  const [temperatureDate, setTemperatureDate] = useState("");
-  const [temperatureValue, setTemperatureValue] = useState("");
 
   const [scale, setScale] = useState(6);
   useEffect(() => {
@@ -56,15 +54,6 @@ const PatientProfile = () => {
         .catch((error) => console.error("Error:", error));
     }
   }, [id]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    console.log("date", temperatureDate);
-    // Add validation here to ensure that a temperature record can only be added once per day
-
-    // Send a POST or PUT request to the server to add or update the temperature record
-  };
 
   if (!patient) {
     return <div>Loading...</div>;
