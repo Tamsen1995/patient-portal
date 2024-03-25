@@ -37,6 +37,7 @@ const PatientProfile = () => {
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [scale, setScale] = useState(6);
+
   useEffect(() => {
     if (id) {
       fetch(`http://localhost:3001/patients/${id}`)
@@ -137,7 +138,7 @@ const PatientProfile = () => {
             </div>
           ))}
           <h2 className="text-lg mb-4">Add Medication</h2>
-          <MedicationForm patientId={patient.id} />
+          <MedicationForm patientId={patient.id} className="" />
         </div>
       </div>
     </div>
