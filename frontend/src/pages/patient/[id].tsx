@@ -1,3 +1,4 @@
+import TemperatureChart from "@/components/TemperatureChart";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
@@ -164,15 +165,7 @@ const PatientProfile = () => {
             <option value={6}>6 Months</option>
           </select>
         </div>
-        <div className="mb-8">
-          <LineChart width={500} height={300} data={filteredData}>
-            <Line type="monotone" dataKey="temperature" stroke="#8884d8" />
-            <CartesianGrid stroke="#ccc" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-          </LineChart>
-        </div>
+        <TemperatureChart data={filteredData} />
       </div>
     </div>
   );
