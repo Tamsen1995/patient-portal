@@ -8,7 +8,6 @@ I designed this platform to empower healthcare providers with a comprehensive to
 
 - **Patient List:** I've made it possible to view a list of patients, each with the option to access a dedicated page for detailed information.
 - **Patient Summary:** Users can access patient details, including name, age, height, weight, and gender.
-- **Health Highlights:** I offer recommendations for daily actions, such as temperature readings and medication administration.
 - **Historical Data:** There's functionality to view temperature charts and current medication details for the past 1, 3, or 6 months.
 - **Data Management:** I've enabled the ability to add or modify temperature readings and medication details, including dosage and administration records.
 
