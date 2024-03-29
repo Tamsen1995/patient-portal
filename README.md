@@ -19,6 +19,12 @@ I designed this platform to empower healthcare providers with a comprehensive to
 
 ### Getting Started
 
+0. **Make sure the right node version is installed:**
+
+   ```sh
+   nvm install
+   ```
+
 1. **Backend Setup:**
 
    - First, navigate to the `backend` directory:
@@ -35,6 +41,7 @@ I designed this platform to empower healthcare providers with a comprehensive to
      ```
 
    The server will populate itself with the patient_data.json. You will see a progress bar.
+
 2. **Frontend Setup:**
    - In a new terminal window, navigate to the `frontend` directory:
      ```sh
