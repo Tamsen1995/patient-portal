@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(router);
 
 const data = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, "../sample.json"), "utf-8")
+  fs.readFileSync(path.resolve(__dirname, "../patient_data.json"), "utf-8")
 );
 
 const bar = new cliProgress.SingleBar(
